@@ -710,7 +710,7 @@ ContextProgress {
     height: auto;
     color: $text-muted;
     margin-bottom: 1;
-    
+
     &.active {
         color: $accent;
         text-style: bold;
@@ -722,18 +722,18 @@ ContextProgress {
     height: auto;
     padding: 0 1;
     margin: 0;
-    
+
     &.current {
         color: $success;
         text-style: bold;
     }
-    
+
     &.selected {
         background: $warning 20%;
         color: $warning;
         text-style: bold;
     }
-    
+
     &.current.selected {
         background: $success 20%;
         color: $success;

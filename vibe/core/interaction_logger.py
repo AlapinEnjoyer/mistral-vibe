@@ -121,7 +121,11 @@ class InteractionLogger:
         for message in messages:
             if message.role == Role.user and message.content:
                 content = message.content.strip()
-                return f"{content[:47]}..." if len(content) > MAX_SESSION_NAME_LENGTH else content
+                return (
+                    f"{content[:47]}..."
+                    if len(content) > MAX_SESSION_NAME_LENGTH
+                    else content
+                )
         return f"Session {datetime.now().strftime('%b %d %H:%M')}"
 
     async def save_interaction(
@@ -136,7 +140,7 @@ class InteractionLogger:
 
         if self.session_metadata is None:
             return None
-        
+
         if self.session_name is None and messages:
             self.session_name = self.generate_session_name(messages)
             self.session_metadata.name = self.session_name
@@ -189,18 +193,18 @@ class InteractionLogger:
         self.session_id = session_id
         self.session_start_time = start_time or datetime.now().isoformat()
         self.session_name = None  # Reset session name for new session
-        
+
         if filepath:
             self.filepath = filepath
         else:
             self.filepath = self._get_save_filepath()
-            
+
         self.session_metadata = self._initialize_session_metadata()
 
     def update_session_name(self, name: str | None) -> None:
         if not self.enabled:
             return
-        
+
         self.session_name = name
         if self.session_metadata is not None:
             self.session_metadata.name = name
@@ -276,9 +280,9 @@ class InteractionLogger:
         session_files = sorted(
             save_dir.glob(f"{config.session_prefix}_*.json"),
             key=lambda p: p.stat().st_mtime,
-            reverse=True
+            reverse=True,
         )
-        
+
         sessions = []
         for filepath in session_files:
             try:
@@ -290,7 +294,7 @@ class InteractionLogger:
                 })
             except Exception:
                 continue
-        
+
         return sessions
 
     @staticmethod
@@ -298,12 +302,12 @@ class InteractionLogger:
         try:
             messages, metadata = InteractionLogger.load_session(filepath)
             metadata["name"] = new_name
-            
+
             interaction_data = {
                 "metadata": metadata,
                 "messages": [m.model_dump(exclude_none=True) for m in messages],
             }
-            
+
             json_content = json.dumps(interaction_data, indent=2, ensure_ascii=False)
             filepath.write_text(json_content, encoding="utf-8")
             return True

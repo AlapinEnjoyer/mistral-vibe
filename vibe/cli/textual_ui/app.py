@@ -831,7 +831,10 @@ class VibeApp(App):
         # Save current session before opening manager to ensure latest state is visible
         if self.agent:
             await self.agent.interaction_logger.save_interaction(
-                self.agent.messages, self.agent.stats, self.config, self.agent.tool_manager
+                self.agent.messages,
+                self.agent.stats,
+                self.config,
+                self.agent.tool_manager,
             )
 
         bottom_container = self.query_one("#bottom-app-container")
@@ -847,22 +850,32 @@ class VibeApp(App):
             self._mode_indicator.display = False
 
         current_session_id = self.agent.session_id if self.agent else ""
-        session_manager_app = SessionManagerApp(self.config.session_logging, current_session_id)
+        session_manager_app = SessionManagerApp(
+            self.config.session_logging, current_session_id
+        )
         await bottom_container.mount(session_manager_app)
         self._current_bottom_app = BottomApp.SessionManager
 
         self.call_after_refresh(session_manager_app.focus)
 
-    async def on_session_manager_app_session_switched(self, message: SessionManagerApp.SessionSwitched) -> None:
+    async def on_session_manager_app_session_switched(
+        self, message: SessionManagerApp.SessionSwitched
+    ) -> None:
         await self._switch_to_input_app()
         await self._switch_to_session(message.session_id)
 
-    async def on_session_manager_app_manager_closed(self, message: SessionManagerApp.ManagerClosed) -> None:
+    async def on_session_manager_app_manager_closed(
+        self, message: SessionManagerApp.ManagerClosed
+    ) -> None:
         await self._switch_to_input_app()
 
-    async def _load_session_data(self, session_id: str) -> tuple[list[LLMMessage], dict[str, Any]] | None:
+    async def _load_session_data(
+        self, session_id: str
+    ) -> tuple[list[LLMMessage], dict[str, Any]] | None:
         """Load session data from disk."""
-        target_session = InteractionLogger.find_session_by_id(session_id, self.config.session_logging)
+        target_session = InteractionLogger.find_session_by_id(
+            session_id, self.config.session_logging
+        )
         if not target_session:
             await self._mount_and_scroll(
                 ErrorMessage("Session not found", collapsed=self._tools_collapsed)
@@ -890,11 +903,13 @@ class VibeApp(App):
         # Set the agent to use the target session_id instead of a new one
         new_agent.session_id = target_session_id
         new_agent.interaction_logger.reset_session(
-            target_session_id, 
-            filepath=InteractionLogger.find_session_by_id(target_session_id, self.config.session_logging),
-            start_time=start_time
+            target_session_id,
+            filepath=InteractionLogger.find_session_by_id(
+                target_session_id, self.config.session_logging
+            ),
+            start_time=start_time,
         )
-        
+
         # Update session name from loaded metadata
         if session_name and session_name != f"Session {target_session_id[:8]}":
             new_agent.interaction_logger.update_session_name(session_name)
@@ -905,7 +920,10 @@ class VibeApp(App):
         try:
             if self.agent:
                 await self.agent.interaction_logger.save_interaction(
-                    self.agent.messages, self.agent.stats, self.config, self.agent.tool_manager
+                    self.agent.messages,
+                    self.agent.stats,
+                    self.config,
+                    self.agent.tool_manager,
                 )
 
             session_data = await self._load_session_data(session_id)
@@ -922,8 +940,7 @@ class VibeApp(App):
 
             if loaded_messages:
                 non_system_messages = [
-                    msg for msg in loaded_messages
-                    if not (msg.role == Role.system)
+                    msg for msg in loaded_messages if not (msg.role == Role.system)
                 ]
                 new_agent.messages.extend(non_system_messages)
 
@@ -934,11 +951,15 @@ class VibeApp(App):
 
         except Exception as e:
             await self._mount_and_scroll(
-                ErrorMessage(f"Failed to switch session: {e!s}", collapsed=self._tools_collapsed)
+                ErrorMessage(
+                    f"Failed to switch session: {e!s}", collapsed=self._tools_collapsed
+                )
             )
             logger.exception("Error switching to session %s", session_id)
 
-    async def _show_session_switch_messages(self, loaded_messages: list[LLMMessage], session_name: str) -> None:
+    async def _show_session_switch_messages(
+        self, loaded_messages: list[LLMMessage], session_name: str
+    ) -> None:
         """Display appropriate messages after switching to a session."""
         if not loaded_messages:
             await self._mount_and_scroll(
@@ -952,11 +973,13 @@ class VibeApp(App):
             if msg.role == Role.user:
                 last_user_idx = len(loaded_messages) - 1 - i
                 break
-        
+
         if last_user_idx == -1:
             # No user messages found, just show summary
             await self._mount_and_scroll(
-                UserCommandMessage(f"✓ Switched to: {session_name} ({len(loaded_messages)} messages)")
+                UserCommandMessage(
+                    f"✓ Switched to: {session_name} ({len(loaded_messages)} messages)"
+                )
             )
             return
 
@@ -964,15 +987,22 @@ class VibeApp(App):
         user_msg = loaded_messages[last_user_idx]
         if user_msg.content:
             await self._mount_and_scroll(UserMessage(str(user_msg.content)))
-         
+
         # Show the assistant response if it exists
-        if last_user_idx + 1 < len(loaded_messages) and loaded_messages[last_user_idx + 1].role == Role.assistant:
+        if (
+            last_user_idx + 1 < len(loaded_messages)
+            and loaded_messages[last_user_idx + 1].role == Role.assistant
+        ):
             assistant_msg = loaded_messages[last_user_idx + 1]
             if assistant_msg.content:
-                await self._mount_and_scroll(AssistantMessage(str(assistant_msg.content)))
-         
+                await self._mount_and_scroll(
+                    AssistantMessage(str(assistant_msg.content))
+                )
+
         await self._mount_and_scroll(
-            UserCommandMessage(f"✓ Switched to: {session_name} ({len(loaded_messages)} messages)")
+            UserCommandMessage(
+                f"✓ Switched to: {session_name} ({len(loaded_messages)} messages)"
+            )
         )
 
     async def _switch_to_input_app(self) -> None:

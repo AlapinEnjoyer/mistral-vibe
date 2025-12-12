@@ -27,7 +27,7 @@ class SessionManagerApp(Static):
     can_focus = True
 
     BINDINGS: ClassVar[list[BindingType]] = [
-        Binding("escape", "close", "Close", show=False, priority=True),
+        Binding("escape", "close", "Close", show=False, priority=True)
     ]
 
     class SessionSwitched(Message):
@@ -51,11 +51,15 @@ class SessionManagerApp(Static):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="session-manager-content"):
-            yield Static("Session Manager", id="sm-title", classes="session-manager-title")
+            yield Static(
+                "Session Manager", id="sm-title", classes="session-manager-title"
+            )
             yield Static("", id="sm-input", classes="session-search")
             yield VerticalScroll(id="sm-list")
             yield Static("", id="sm-status", classes="session-status")
-            yield Static(self._help_text(), id="sm-help", classes="session-manager-help")
+            yield Static(
+                self._help_text(), id="sm-help", classes="session-manager-help"
+            )
 
     def on_mount(self) -> None:
         self._load_sessions()
@@ -72,6 +76,7 @@ class SessionManagerApp(Static):
                 return "Type new name · (Enter) save · (Esc) cancel"
             case Mode.DELETE:
                 return "(Enter)/(y) confirm · (n)/(Esc) cancel"
+
     def _load_sessions(self) -> None:
         try:
             from vibe.core.interaction_logger import InteractionLogger
@@ -179,7 +184,8 @@ class SessionManagerApp(Static):
             self._filtered = self._sessions.copy()
         else:
             self._filtered = [
-                s for s in self._sessions
+                s
+                for s in self._sessions
                 if query in f"{s['name']} {s['id']} {s['time']}".lower()
             ]
         self._cursor = 0
@@ -262,8 +268,12 @@ class SessionManagerApp(Static):
                 if selected:
                     self._mode = Mode.LIST
                     real_idx = next(
-                        (i for i, s in enumerate(self._sessions) if s["id"] == selected["id"]),
-                        0
+                        (
+                            i
+                            for i, s in enumerate(self._sessions)
+                            if s["id"] == selected["id"]
+                        ),
+                        0,
                     )
                     self._cursor = real_idx
                     self._input_buffer = ""
@@ -401,7 +411,10 @@ class SessionManagerApp(Static):
             path = InteractionLogger.find_session_by_id(self._target_id, self._config)
             if path:
                 Path(path).unlink()
-                name = next((s["name"] for s in self._sessions if s["id"] == self._target_id), "?")
+                name = next(
+                    (s["name"] for s in self._sessions if s["id"] == self._target_id),
+                    "?",
+                )
                 self._set_status(f"✓ Deleted: {name}")
                 self._load_sessions()
                 self._clamp_cursor()

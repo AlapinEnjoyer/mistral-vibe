@@ -13,7 +13,6 @@ from vibe.core.types import LLMMessage, Role
 
 
 class TestSessionManagement:
-
     @pytest.fixture
     def temp_session_dir(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -22,9 +21,7 @@ class TestSessionManagement:
     @pytest.fixture
     def session_config(self, temp_session_dir):
         return SessionLoggingConfig(
-            save_dir=str(temp_session_dir),
-            session_prefix="test_session",
-            enabled=True
+            save_dir=str(temp_session_dir), session_prefix="test_session", enabled=True
         )
 
     @pytest.fixture
@@ -32,7 +29,7 @@ class TestSessionManagement:
         return InteractionLogger(
             session_config=session_config,
             session_id="test-session-123",
-            session_name="Test Session"
+            session_name="Test Session",
         )
 
     def test_session_metadata_with_name(self, interaction_logger):
@@ -44,8 +41,13 @@ class TestSessionManagement:
     def test_generate_session_name_from_user_message(self, interaction_logger):
         messages = [
             LLMMessage(role=Role.system, content="System prompt"),
-            LLMMessage(role=Role.user, content="Help me build a web application with React and TypeScript"),
-            LLMMessage(role=Role.assistant, content="I'll help you build that web application!")
+            LLMMessage(
+                role=Role.user,
+                content="Help me build a web application with React and TypeScript",
+            ),
+            LLMMessage(
+                role=Role.assistant, content="I'll help you build that web application!"
+            ),
         ]
 
         name = interaction_logger.generate_session_name(messages)
@@ -53,9 +55,7 @@ class TestSessionManagement:
         assert len(name) <= 50  # Should be truncated
 
     def test_generate_session_name_short_message(self, interaction_logger):
-        messages = [
-            LLMMessage(role=Role.user, content="Hello")
-        ]
+        messages = [LLMMessage(role=Role.user, content="Hello")]
 
         name = interaction_logger.generate_session_name(messages)
         assert name == "Hello"
@@ -68,7 +68,7 @@ class TestSessionManagement:
     def test_generate_session_name_no_user_messages(self, interaction_logger):
         messages = [
             LLMMessage(role=Role.system, content="System prompt"),
-            LLMMessage(role=Role.assistant, content="Hello! How can I help?")
+            LLMMessage(role=Role.assistant, content="Hello! How can I help?"),
         ]
 
         name = interaction_logger.generate_session_name(messages)
@@ -81,7 +81,7 @@ class TestSessionManagement:
             InteractionLogger(
                 session_config=session_config,
                 session_id=f"session-{i}",
-                session_name=f"Test Session {i}"
+                session_name=f"Test Session {i}",
             )
 
             sessions = InteractionLogger.get_all_sessions(session_config)
@@ -115,7 +115,7 @@ class TestSessionManagement:
             "git_branch": None,
             "auto_approve": False,
             "username": "testuser",
-            "environment": {"working_directory": "/test"}
+            "environment": {"working_directory": "/test"},
         }
 
         # Save initial session data
@@ -125,11 +125,14 @@ class TestSessionManagement:
         }
 
         import json
+
         json_content = json.dumps(interaction_data, indent=2, ensure_ascii=False)
         session_file.write_text(json_content, encoding="utf-8")
 
         # Test renaming
-        success = InteractionLogger.rename_session_file(session_file, "New Session Name")
+        success = InteractionLogger.rename_session_file(
+            session_file, "New Session Name"
+        )
         assert success is True
 
         # Verify the rename worked
@@ -147,11 +150,13 @@ class TestSessionManagement:
         InteractionLogger(
             session_config=session_config,
             session_id="test-session-abc123",
-            session_name="Find Me Session"
+            session_name="Find Me Session",
         )
 
         # Test finding by full ID
-        found = InteractionLogger.find_session_by_id("test-session-abc123", session_config)
+        found = InteractionLogger.find_session_by_id(
+            "test-session-abc123", session_config
+        )
         # Since we haven't saved the session, this will be None
         assert found is None or isinstance(found, Path)
 

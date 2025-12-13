@@ -58,7 +58,7 @@ class ApiKeyScreen(OnboardingScreen):
         )
 
     def _compose_config_docs(self) -> ComposeResult:
-        yield Static("[dim]Learn more about Vibe configuration:[/]")
+        yield Static("[dim]Learn more about Vaybeeton configuration:[/]")
         yield Horizontal(
             Static("→ ", classes="link-chevron"),
             Link(CONFIG_DOCS_URL, url=CONFIG_DOCS_URL),

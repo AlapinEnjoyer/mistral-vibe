@@ -43,8 +43,12 @@ class LineAnimationState:
 
 class WelcomeBanner(Static):
     FLASH_COLOR = "#FFFFFF"
-    TARGET_COLORS = ("#FFD800", "#FFAF00", "#FF8205", "#FA500F", "#E10500")
-    BORDER_TARGET_COLOR = "#b05800"
+    TARGET_COLORS = (
+    "#1b5e20", "#256b2a", "#2f7934", "#388e3c",
+    "#429d44", "#4caf50", "#57bb5a", "#66bb6a",
+    "#72c177", "#81c784", "#90ce92", "#a0d4a1"
+)
+    BORDER_TARGET_COLOR = "#2e7d32"
 
     LINE_ANIMATION_DURATION_MS = 200
     LINE_STAGGER_MS = 280
@@ -88,12 +92,12 @@ class WelcomeBanner(Static):
             + self.LINE_ANIMATION_DURATION_MS
         ) / 1000
 
-        self._cached_text_lines: list[Text | None] = [None] * 7
+        self._cached_text_lines: list[Text | None] = [None] * 14
         self._initialize_static_line_suffixes()
 
     def _initialize_static_line_suffixes(self) -> None:
         self._static_line1_suffix = (
-            f"{self.LOGO_TEXT_GAP}[b]Mistral Vibe v{__version__}[/]"
+            f"{self.LOGO_TEXT_GAP}[b]Vaybeeton v{__version__}[/]"
         )
         self._static_line2_suffix = (
             f"{self.LOGO_TEXT_GAP}[dim]{self.config.active_model}[/]"
@@ -104,7 +108,7 @@ class WelcomeBanner(Static):
         self._static_line5_suffix = (
             f"{self.LOGO_TEXT_GAP}[dim]{self.config.effective_workdir}[/]"
         )
-        block = (self.SPACE * 4) + self.LOGO_TEXT_GAP
+        block = (self.SPACE * 2) + self.LOGO_TEXT_GAP
         self._static_line7 = f"{block}[dim]Type[/] [{self.BORDER_TARGET_COLOR}]/help[/] [dim]for more information[/]"
 
     @property
@@ -121,8 +125,8 @@ class WelcomeBanner(Static):
 
     def _init_after_styles(self) -> None:
         self._cache_skeleton_color()
-        self._cached_text_lines[5] = Text("")
-        self._cached_text_lines[6] = Text.from_markup(self._static_line7)
+        self._cached_text_lines[12] = Text("")
+        self._cached_text_lines[13] = Text.from_markup(self._static_line7)
         self._update_display()
         self._start_animation()
 
@@ -236,7 +240,7 @@ class WelcomeBanner(Static):
         return interpolate_color(self._flash_rgb, target_rgb, phase)
 
     def _update_display(self) -> None:
-        for idx in range(5):
+        for idx in range(12):
             self._update_colored_line(idx, idx)
 
         lines = [line if line else Text("") for line in self._cached_text_lines]
@@ -270,14 +274,34 @@ class WelcomeBanner(Static):
         )
 
     def _build_line(self, line_idx: int, color: str) -> str:
-        B = self.BLOCK
-        S = self.SPACE
+            B = self.BLOCK
+            S = self.SPACE
 
-        patterns = [
-            f"{S}[{color}]{B}[/]{S}{S}{S}[{color}]{B}[/]{S}{self._static_line1_suffix}",
-            f"{S}[{color}]{B}{B}[/]{S}[{color}]{B}{B}[/]{S}{self._static_line2_suffix}",
-            f"{S}[{color}]{B}{B}{B}{B}{B}[/]{S}{self._static_line3_suffix}",
-            f"{S}[{color}]{B}[/]{S}[{color}]{B}[/]{S}[{color}]{B}[/]{S}",
-            f"[{color}]{B}{B}{B}[/]{S}[{color}]{B}{B}{B}[/]{self._static_line5_suffix}",
-        ]
-        return patterns[line_idx]
+            suffix = ""
+            if line_idx == 3:
+                suffix = self._static_line1_suffix
+            elif line_idx == 5:
+                suffix = self._static_line2_suffix
+            elif line_idx == 7:
+                suffix = self._static_line3_suffix
+            elif line_idx == 9:
+                suffix = self._static_line5_suffix
+
+            patterns = [
+                f"{S*4}[{color}]{B*4}[/]{S*4}{suffix}",
+                f"{S*2}[{color}]{B*8}[/]{S*2}{suffix}",
+                f"{S*1}[{color}]{B*5}[/]{S*2}[{color}]{B*3}[/]{S*1}{suffix}",
+                f"[{color}]{B*5}[/]{S*2}[{color}]{B*5}[/]{suffix}",
+                f"[{color}]{B*4}[/]{S*4}[{color}]{B*4}[/]{suffix}",
+                f"[{color}]{B*3}[/]{S*6}[{color}]{B*3}[/]{suffix}",
+                f"[{color}]{B*3}[/]{S*6}[{color}]{B*3}[/]{suffix}",
+                f"[{color}]{B*4}[/]{S*4}[{color}]{B*4}[/]{suffix}",
+                f"[{color}]{B*5}[/]{S*2}[{color}]{B*5}[/]{suffix}",
+                f"{S*1}[{color}]{B*3}[/]{S*2}[{color}]{B*5}[/]{S*1}{suffix}",
+                f"{S*2}[{color}]{B*8}[/]{S*2}{suffix}",
+                f"{S*4}[{color}]{B*4}[/]{S*4}{suffix}",
+            ]
+
+            if 0 <= line_idx < len(patterns):
+                return patterns[line_idx]
+            return ""

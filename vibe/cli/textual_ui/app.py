@@ -621,7 +621,7 @@ class VibeApp(App):
         """Switch to the configuration app in the bottom panel."""
         if self._current_bottom_app == BottomApp.Config:
             return
-        await self._switch_to_config_app()
+        await self._switch_to_config_app()  
 
     async def _reload_config(self) -> None:
         try:

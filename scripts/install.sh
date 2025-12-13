@@ -78,26 +78,30 @@ function install_uv() {
     fi
 }
 
-function install_vibe() {
-    info "Installing mistral-vibe from GitHub repository using uv..."
-    uv tool install mistral-vibe
+function install_vaybeeton() {
+    info "Installing vaybeeton from GitHub repository using uv..."
+    uv tool install "git+https://github.com/AlapinEnjoyer/mistral-vibe"
 
-    success "Mistral Vibe installed successfully! (commands: vibe, vibe-acp)"
+    success "Vaybeeton installed successfully! (commands: vbt, vbt-acp)"
 }
 
 function main() {
     echo
-    echo "██████████████████░░"
-    echo "██████████████████░░"
-    echo "████  ██████  ████░░"
-    echo "████    ██    ████░░"
-    echo "████          ████░░"
-    echo "████  ██  ██  ████░░"
-    echo "██      ██      ██░░"
-    echo "██████████████████░░"
-    echo "██████████████████░░"
     echo
-    echo "Starting Mistral Vibe installation..."
+    echo "        ████████        "
+    echo "    ████████████████    "
+    echo "  ██████████    ██████  "
+    echo "██████████    ██████████"
+    echo "████████        ████████"
+    echo "██████            ██████"
+    echo "██████            ██████"
+    echo "████████        ████████"
+    echo "██████████    ██████████"
+    echo "  ██████    ██████████  "
+    echo "    ████████████████    "
+    echo "        ████████        "
+    echo
+    echo "Starting Vaybeeton installation..."
     echo
 
     check_platform
@@ -108,18 +112,18 @@ function main() {
         install_uv
     fi
 
-    install_vibe
+    install_vaybeeton
 
-    if command -v vibe &> /dev/null; then
+    if command -v vbt &> /dev/null; then
         success "Installation completed successfully!"
         echo
-        echo "You can now run vibe with:"
-        echo "  vibe"
+        echo "You can now run vaybeeton with:"
+        echo "  vbt"
         echo
         echo "Or for ACP mode:"
-        echo "  vibe-acp"
+        echo "  vbt-acp"
     else
-        error "Installation completed but 'vibe' command not found"
+        error "Installation completed but 'vbt' command not found"
         error "Please check your installation and PATH settings"
         exit 1
     fi

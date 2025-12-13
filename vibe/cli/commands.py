@@ -52,14 +52,9 @@ class CommandRegistry:
                 handler="_compact_history",
             ),
             "session": Command(
-                aliases=frozenset(["/session", "/sessions"]),
+                aliases=frozenset(["/session"]),
                 description="Session manager - list, switch, rename, and delete sessions",
                 handler="_show_session_manager",
-            ),
-            "rename": Command(
-                aliases=frozenset(["/rename"]),
-                description="Rename sessions (opens session manager)",
-                handler="_rename_session",
             ),
             "exit": Command(
                 aliases=frozenset(["/exit", "/quit", "/q"]),

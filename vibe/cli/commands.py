@@ -56,11 +56,6 @@ class CommandRegistry:
                 description="Session manager - list, switch, rename, and delete sessions",
                 handler="_show_session_manager",
             ),
-            "rename": Command(
-                aliases=frozenset(["/rename"]),
-                description="Rename sessions (opens session manager)",
-                handler="_rename_session",
-            ),
             "exit": Command(
                 aliases=frozenset(["/exit", "/quit", "/q"]),
                 description="Exit the application",
